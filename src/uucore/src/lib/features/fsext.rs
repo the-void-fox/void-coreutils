@@ -540,6 +540,7 @@ pub fn read_fs_list() -> UResult<Vec<MountInfo>> {
         target_os = "redox",
         target_os = "illumos",
         target_os = "solaris",
+        target_os = "void",
     ))]
     {
         // No method to read mounts on these platforms

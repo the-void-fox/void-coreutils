@@ -38,7 +38,6 @@ walkdir = { workspace = true }
 indicatif = { workspace = true }
 thiserror = { workspace = true }
 fluent = { workspace = true }
-rustix = { workspace = true }
 
 [target.'cfg(any(target_os = "linux", target_os = "android"))'.dependencies]
 selinux = { workspace = true, optional = true }
@@ -63,3 +62,6 @@ harness = false
 [features]
 feat_selinux = ["selinux", "uucore/selinux"]
 feat_acl = ["exacl"]
+
+[target.'cfg(any(unix, target_os = "wasi"))'.dependencies]
+rustix = { workspace = true }

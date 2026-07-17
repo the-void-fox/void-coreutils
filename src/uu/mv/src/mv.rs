@@ -820,7 +820,7 @@ fn rename_with_fallback(
         const EXDEV: i32 = windows_sys::Win32::Foundation::ERROR_NOT_SAME_DEVICE as _;
         #[cfg(unix)]
         const EXDEV: i32 = libc::EXDEV as _;
-        #[cfg(target_os = "wasi")]
+        #[cfg(any(target_os = "wasi", target_os = "void"))]
         const EXDEV: i32 = 18; // POSIX EXDEV value
 
         // We will only copy if:
@@ -1009,7 +1009,7 @@ fn rename_symlink_fallback(from: &Path, to: &Path) -> io::Result<()> {
     }
 }
 
-#[cfg(target_os = "wasi")]
+#[cfg(any(target_os = "wasi", target_os = "void"))]
 fn rename_symlink_fallback(_from: &Path, _to: &Path) -> io::Result<()> {
     Err(io::Error::other(translate!("mv-error-no-symlink-support")))
 }

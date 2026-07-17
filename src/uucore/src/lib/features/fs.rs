@@ -42,7 +42,7 @@ pub struct FileInformation(
     #[cfg(unix)] rustix::fs::Stat,
     #[cfg(windows)] winapi_util::file::Information,
     // WASI does not have nix::sys::stat, so we store std::fs::Metadata instead.
-    #[cfg(target_os = "wasi")] fs::Metadata,
+    #[cfg(any(target_os = "wasi", target_os = "void"))] fs::Metadata,
 );
 
 impl FileInformation {
@@ -90,7 +90,7 @@ impl FileInformation {
             Self::from_file(&file)
         }
         // WASI: use std::fs::metadata / symlink_metadata since nix is not available
-        #[cfg(target_os = "wasi")]
+        #[cfg(any(target_os = "wasi", target_os = "void"))]
         {
             let metadata = if dereference {
                 fs::metadata(path.as_ref())
@@ -111,7 +111,7 @@ impl FileInformation {
         {
             self.0.file_size()
         }
-        #[cfg(target_os = "wasi")]
+        #[cfg(any(target_os = "wasi", target_os = "void"))]
         {
             self.0.len()
         }
@@ -166,7 +166,7 @@ impl FileInformation {
         #[cfg(windows)]
         return self.0.number_of_links();
         // WASI: nlink is not available in std::fs::Metadata, return 1
-        #[cfg(target_os = "wasi")]
+        #[cfg(any(target_os = "wasi", target_os = "void"))]
         return 1;
     }
 
@@ -189,7 +189,7 @@ impl PartialEq for FileInformation {
 
 // WASI: compare by file type and size as a basic heuristic since
 // device/inode numbers are not available through std::fs::Metadata.
-#[cfg(target_os = "wasi")]
+#[cfg(any(target_os = "wasi", target_os = "void"))]
 impl PartialEq for FileInformation {
     fn eq(&self, other: &Self) -> bool {
         self.0.file_type() == other.0.file_type() && self.0.len() == other.0.len()
@@ -218,7 +218,7 @@ impl Hash for FileInformation {
             self.0.volume_serial_number().hash(state);
             self.0.file_index().hash(state);
         }
-        #[cfg(target_os = "wasi")]
+        #[cfg(any(target_os = "wasi", target_os = "void"))]
         {
             self.0.len().hash(state);
             self.0.file_type().is_dir().hash(state);
@@ -771,6 +771,15 @@ pub fn path_ends_with_terminator(path: &Path) -> bool {
         .is_some_and(|&byte| byte == b'/')
 }
 
+// VOID: без OsStrExt — у OsStr есть стабильный as_encoded_bytes.
+#[cfg(target_os = "void")]
+pub fn path_ends_with_terminator(path: &Path) -> bool {
+    path.as_os_str()
+        .as_encoded_bytes()
+        .last()
+        .is_some_and(|&byte| byte == b'/')
+}
+
 #[cfg(windows)]
 pub fn path_ends_with_terminator(path: &Path) -> bool {
     use std::os::windows::prelude::OsStrExt;
@@ -810,7 +819,7 @@ pub fn is_stdin_directory(stdin: &Stdin) -> bool {
     }
 
     // WASI: stdin is never a directory
-    #[cfg(target_os = "wasi")]
+    #[cfg(any(target_os = "wasi", target_os = "void"))]
     {
         let _ = stdin;
         false

@@ -10,7 +10,7 @@ pub use self::unix::is_unsafe_overwrite;
 pub use self::windows::is_unsafe_overwrite;
 
 // WASI: no fstat-based device/inode checks available; assume safe.
-#[cfg(target_os = "wasi")]
+#[cfg(any(target_os = "wasi", target_os = "void"))]
 pub fn is_unsafe_overwrite<I, O>(_input: &I, _output: &O) -> bool {
     false
 }

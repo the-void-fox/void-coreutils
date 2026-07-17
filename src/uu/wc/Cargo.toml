@@ -20,7 +20,7 @@ test = false
 doctest = false
 
 [dependencies]
-bytecount = { workspace = true, features = ["runtime-dispatch-simd"] }
+bytecount = { workspace = true }
 clap = { workspace = true }
 fluent = { workspace = true }
 thiserror = { workspace = true }

@@ -769,3 +769,7 @@ debug = true
 
 [lints]
 workspace = true
+
+[patch.crates-io]
+filetime = { path = "patches/filetime" }
+console = { path = "patches/console" }

@@ -21,7 +21,6 @@ doctest = false
 [dependencies]
 clap = { workspace = true }
 memchr = { workspace = true }
-rustix = { workspace = true, features = ["fs"] }
 thiserror = { workspace = true }
 uucore = { workspace = true, features = ["fast-inc", "fs", "pipes", "signals"] }
 fluent = { workspace = true }
@@ -45,3 +44,6 @@ path = "src/main.rs"
 [[bench]]
 name = "cat_bench"
 harness = false
+
+[target.'cfg(any(unix, target_os = "wasi"))'.dependencies]
+rustix = { workspace = true, features = ["fs"] }

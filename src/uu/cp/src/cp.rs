@@ -1927,10 +1927,10 @@ pub(crate) fn copy_attributes(
 fn symlink_file(
     source: &Path,
     dest: &Path,
-    #[cfg(not(target_os = "wasi"))] symlinked_files: &mut HashSet<FileInformation>,
-    #[cfg(target_os = "wasi")] _symlinked_files: &mut HashSet<FileInformation>,
+    #[cfg(not(any(target_os = "wasi", target_os = "void")))] symlinked_files: &mut HashSet<FileInformation>,
+    #[cfg(any(target_os = "wasi", target_os = "void"))] _symlinked_files: &mut HashSet<FileInformation>,
 ) -> CopyResult<()> {
-    #[cfg(target_os = "wasi")]
+    #[cfg(any(target_os = "wasi", target_os = "void"))]
     {
         Err(CpError::IoErrContext(
             io::Error::new(io::ErrorKind::Unsupported, "symlinks not supported"),
@@ -1939,7 +1939,7 @@ fn symlink_file(
                        "source" => get_filename(source).unwrap_or("?").quote()),
         ))
     }
-    #[cfg(not(any(windows, target_os = "wasi")))]
+    #[cfg(not(any(windows, any(target_os = "wasi", target_os = "void"))))]
     {
         std::os::unix::fs::symlink(source, dest).map_err(|e| {
             CpError::IoErrContext(
@@ -1961,7 +1961,7 @@ fn symlink_file(
             )
         })?;
     }
-    #[cfg(not(target_os = "wasi"))]
+    #[cfg(not(any(target_os = "wasi", target_os = "void")))]
     {
         if let Ok(file_info) = FileInformation::from_path(dest, false) {
             symlinked_files.insert(file_info);

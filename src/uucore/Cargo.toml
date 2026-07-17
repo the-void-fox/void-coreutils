@@ -36,7 +36,6 @@ jiff = { workspace = true, optional = true, features = [
   "tzdb-concatenated",
 ] }
 rustc-hash = { workspace = true }
-rustix = { workspace = true, features = ["fs", "net", "pipe", "process"] }
 time = { workspace = true, optional = true, features = [
   "formatting",
   "local-offset",
@@ -208,3 +207,6 @@ tty = []
 time = ["jiff"]
 uptime = ["jiff", "libc", "windows-sys", "utmpx", "utmp-classic"]
 benchmark = ["divan", "itertools", "tempfile"]
+
+[target.'cfg(any(unix, windows))'.dependencies]
+rustix = { workspace = true, features = ["fs", "net", "pipe", "process"] }
